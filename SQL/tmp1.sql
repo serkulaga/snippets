@@ -14,15 +14,15 @@ WHERE fv.FileID IN
 	(
 		SELECT t2.a.value(N'@href', N'nvarchar(max)') as fileLink
 		FROM   tbl_HomepageContent
-				CROSS APPLY (select CAST(Content AS xml)) as t1(c)
+				CROSS APPLY (select CAST(REPLACE(Content, '&nbsp;', '') AS xml)) as t1(c)
 				CROSS APPLY t1.c.nodes('/div/div/a') AS t2(a)
-		WHERE AreaID = 1194
+		WHERE AreaID = 1194 AND len(Content) > 0
 	) as t3
 )
 
 
 --
-SELECT u.UserName, Name as Report, CountMonth as 'Number of times viewed in last month', CountYear 'Number of times viewed in last year' FROM 
+SELECT u.UserName, Name as Report, ISNULL(CountMonth, 0) as 'Number of times viewed in last month', CountYear 'Number of times viewed in last year' FROM 
 (
 	SELECT t2.Name, t2.UserId, CountMonth, CountYear FROM
 	(
